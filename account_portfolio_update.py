@@ -1,51 +1,57 @@
-from ibapi.client import *
-from ibapi.wrapper import *
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
+from threading import Timer
 
-class TestApp(EClient, EWrapper):
+class TestApp(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self, self)
 
+    
+    # def error(self, reqId, errorCode, errorString):
+    #     print("Error: ", reqId, " ", errorCode, " ", errorString)
 
-    def error(self, reqId, errorCode, errorString):
-        print(f'Error: {reqId} {errorCode} {errorString}')
 
-
-    def nextValidId(self, orderId: int):
-        # return super().nextValidId(orderId)
+    def nextValidId(self, orderId):
         self.start()
 
 
-    def updatePortfolio(self, contract: Contract, position: Decimal, marketPrice: float, marketValue: float, averageCost: float, unrealizedPNL: float, realizedPNL: float, accountName: str):
-        # return super().updatePortfolio(contract, position, marketPrice, marketValue, averageCost, unrealizedPNL, realizedPNL, accountName)
-        print(f'UpdatePortfolio. Symbol: {contract.symbol}, SecType: {contract.secType}, Exchange: {contract.exchange}, Position: {position}, MarketPrice: {marketPrice}, MarketValue: {marketValue}, AverageCost: {averageCost}, UnrealizedPNL: {unrealizedPNL}, RealizedPNL: {realizedPNL}, AccountName: {accountName}')
+    def updatePortfolio(self, contract: Contract, position: float, marketPrice: float, marketValue: float,
+                        averageCost: float, unrealizedPNL: float, realizedPNL: float, accountName: str):
+        print("UpdatePortfolio.", "Symbol:", contract.symbol, "SecType:", contract.secType, "Exchange:", contract.exchange,
+              "Position:", position, "MarketPrice:", marketPrice, "MarketValue:", marketValue, "AverageCost:", averageCost,
+              "UnrealizedPNL:", unrealizedPNL, "RealizedPNL:", realizedPNL, "AccountName:", accountName)
 
 
     def updateAccountValue(self, key: str, val: str, currency: str, accountName: str):
-        # return super().updateAccountValue(key, val, currency, accountName)
-        print(f'UpdateAccountValue. Key: {key}, Value: {val}, Currency: {currency}, AccountName: {accountName}')
+        print("UpdateAccountValue. Key:", key, "Value:", val, "Currency:", currency, "AccountName:", accountName)
 
 
     def updateAccountTime(self, timeStamp: str):
-        # return super().updateAccountTime(timeStamp)
-        print(f'updateAccountTime. Time: {timeStamp}')
+        print("UpdateAccountTime. Time:", timeStamp)
 
 
     def accountDownloadEnd(self, accountName: str):
-        # return super().accountDownloadEnd(accountName)
-        print(f'AccountDownloadEnd. Account {accountName}')
+        print("AccountDownloadEnd. Account:", accountName)
 
 
     def start(self):
-        #Account number can be ommitted when using reqAccountUpdates with single account structure
-        self.reqAccountUpdates(True, '')
+        # Account number can be omitted when using reqAccountUpdates with single account structure
+        self.reqAccountUpdates(True, "")
 
 
     def stop(self):
-        self.reqAccountUpdates(False, '')
+        self.reqAccountUpdates(False, "")
         self.done = True
         self.disconnect()
 
 
-app = TestApp()
-app.connect('127.0.0.1', 7497, 1511)
-app.run()
+def main():
+    app = TestApp()
+    app.connect("127.0.0.1", 7496, 997)
+
+    Timer(5, app.stop).start()
+    app.run()
+
+if __name__ == "__main__":
+    main()
